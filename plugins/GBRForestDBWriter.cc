@@ -1,6 +1,6 @@
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -9,7 +9,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 
 
-#include "CondFormats/EgammaObjects/interface/GBRForestD.h"
+#include "CondFormats/GBRForest/interface/GBRForestD.h"
 #include "CondFormats/DataRecord/interface/GBRWrapperRcd.h"
 #include "CondCore/DBOutputService/interface/PoolDBOutputService.h"
 
@@ -17,7 +17,7 @@
 
 #include <string>
 
-class GBRForestDBWriter : public edm::EDAnalyzer {
+class GBRForestDBWriter : public edm::one::EDAnalyzer<> {
 public:
   struct GBRForestData {
     std::string filename;
@@ -48,11 +48,6 @@ private:
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
   
-    virtual void beginRun(edm::Run const&, edm::EventSetup const&) override{}
-  virtual void endRun(edm::Run const&, edm::EventSetup const&) override{}
-  virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override{}
-  virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override{}
-  
   std::vector<GBRForestData> gbrForestData_;
 
 };
@@ -73,8 +68,8 @@ void writeGBRForest(cond::service::PoolDBOutputService& dbService,
 		    const std::string& filename,
 		    const std::string& fileLabel)
 {
-  const GBRForestD* forest = getForestFromFile(filename,fileLabel);
-  dbService.writeOne(forest,dbService.beginOfTime(),dbLabel);
+  const GBRForestD& forest = *getForestFromFile(filename,fileLabel);
+  dbService.writeOneIOV(forest,dbService.beginOfTime(),dbLabel);
 }
 
 
